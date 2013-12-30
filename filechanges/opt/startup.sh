@@ -61,13 +61,23 @@ then
     sed -i -e "/^\[MusicBox\]/,/^\[.*\]/ s|^\(ROOT_PASSWORD[ \t]*=[ \t]*\).*$|\1''\r|" $CONFIG_FILE
 fi
 
-#put wifi settings for wpa
-cat >/etc/wpa.conf <<EOF
+if [ "$INI__MusicBox__MUSICBOX_AP_MODE" == "true" ]
+then
+    #ln -sf /etc/network/interfaces-static /etc/network/interfaces
+    ifup -i /etc/network/interfaces-static wlan0
+    service isc-dhcp-server start
+    service hostapd start
+else
+    #put wifi settings for wpa
+    #ln -sf /etc/network/interfaces-dhcp /etc/network/interfaces
+    cat >/etc/wpa.conf <<EOF
 network={
     ssid="$INI__MusicBox__WIFI_NETWORK"
     psk="$INI__MusicBox__WIFI_PASSWORD"
 }
 EOF
+    ifup -i /etc/network/interfaces-dhcp wlan0
+fi
 
 #if output not defined, it will automatically detect usb, hdmi. Order: I2S / USB / HDMI / Analog  (to lowercase)
 OUTPUT=$(echo $INI__MusicBox__OUTPUT | tr "[:upper:]" "[:lower:]")
@@ -219,6 +229,15 @@ do
     MYIP=$(hostname -I)
 done
 
+# start SSH if enabled
+if [ "$INI__MusicBox__ENABLE_SSH" == "true" ]
+then
+    $SSH_COMMAND
+    iptables -A INPUT -p tcp --dport 22 -j ACCEPT > /dev/null 2>&1 || true
+else
+    iptables -A INPUT -p tcp --dport 22 -j DENY > /dev/null 2>&1 || true
+fi
+
 # set date/time
 ntpdate ntp.ubuntu.com > /dev/null 2>&1 || true
 
@@ -289,15 +308,5 @@ if [ "$_IP" ]; then
     echo
 fi
 
-# start SSH if enabled
-if [ "$INI__MusicBox__ENABLE_SSH" == "true" ]
-then
-    $SSH_COMMAND
-    iptables -A INPUT -p tcp --dport 22 -j ACCEPT > /dev/null 2>&1 || true
-else
-    iptables -A INPUT -p tcp --dport 22 -j DENY > /dev/null 2>&1 || true
-fi
-
 #start mopidy 
-/opt/startmopidy.sh > /dev/null 2>&1 || true
-#/opt/startmopidy.sh
+service mopidy start
