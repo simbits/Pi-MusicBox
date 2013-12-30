@@ -297,5 +297,4 @@ else
 fi
 
 #start mopidy 
-/opt/startmopidy.sh > /dev/null 2>&1 || true
-#/opt/startmopidy.sh
+service mopidy start

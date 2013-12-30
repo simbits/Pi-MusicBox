@@ -1,0 +1,72 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:		    mopidy
+# Required-Start:	
+# Required-Stop:	
+# Should-Start:		$network
+# Should-Stop:
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:    Mopidy MPD Daemon	
+# Description:  Mopidy MPD Daemon	
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MOPIDY_BIN=/usr/bin/mopidy
+MOPIDY_DEFAULTS=/etc/default/mopidy
+MOPIDY_UID=musicbox
+MOPIDY_GID=musicbox
+MOPIDY_NICE=5
+NAME=mopidy
+DESC="Mopidy MPD Daemon"
+PIDFILE=/var/run/mopidy.pid
+
+[ -x "$MOPIDY_BIN" ] || exit 0
+[ -s "$MOPIDY_DEFAULTS" ] || exit 0
+
+MOPIDY_OPTS=
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	start-stop-daemon --start --background --oknodo \
+        --nicelevel $MOPIDY_NICE \
+        --chuid $MOPIDY_UID:$MOPIDY_GID \
+        --exec "$MOPIDY_BIN" \
+		--make-pidfile --pidfile "$PIDFILE" -- $DAEMON_OPTS > /dev/null
+	log_end_msg "$?"
+	;;
+  stop)
+	log_daemon_msg "Stopping $DESC" "$NAME"
+	start-stop-daemon --stop --oknodo \
+        --user $MOPIDY_UID \
+		--pidfile "$PIDFILE"
+	log_end_msg "$?"
+	;;
+  reload)
+  	log_daemon_msg "Reloading $DESC" "$NAME"
+	start-stop-daemon --stop --signal HUP \
+        --user $MOPIDY_UID \
+		--pidfile "$PIDFILE"
+	log_end_msg "$?"
+	;;
+  restart|force-reload)
+  	$0 stop
+	sleep 8
+	$0 start
+	;;
+  status)
+	status_of_proc "$MOPIDY_BIN" "$NAME"
+	exit $?
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload|reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
