@@ -309,4 +309,4 @@ if [ "$_IP" ]; then
 fi
 
 #start mopidy 
-service mopidy start
+/opt/startmopidy.sh > /dev/null 2>&1 || true
