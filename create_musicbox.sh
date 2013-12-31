@@ -17,7 +17,7 @@ wget -q -O /etc/apt/sources.list.d/mopidy.list http://apt.mopidy.com/mopidy.list
 
 #Then install all packages we need with this command:
 
-sudo apt-get update && sudo apt-get --yes --no-install-suggests --no-install-recommends install logrotate mopidy alsa-utils python-cherrypy3 python-ws4py wpasupplicant python-spotify gstreamer0.10-alsa ifplugd gstreamer0.10-fluendo-mp3 gstreamer0.10-tools samba dos2unix avahi-utils alsa-base python-pylast cifs-utils avahi-autoipd libnss-mdns ntpdate ca-certificates ncmpcpp rpi-update linux-wlan-ng alsa-firmware-loaders iw atmel-firmware firmware-atheros firmware-brcm80211 firmware-ipw2x00 firmware-iwlwifi firmware-libertas firmware-linux firmware-linux-nonfree firmware-ralink firmware-realtek zd1211-firmware linux-wlan-ng-firmware alsa-firmware-loaders
+sudo apt-get update && sudo apt-get --yes --no-install-suggests --no-install-recommends install logrotate mopidy alsa-utils python-cherrypy3 python-ws4py wpasupplicant python-spotify gstreamer0.10-alsa ifplugd gstreamer0.10-fluendo-mp3 gstreamer0.10-tools samba dos2unix avahi-utils alsa-base python-pylast cifs-utils avahi-autoipd libnss-mdns ntpdate ca-certificates ncmpcpp rpi-update linux-wlan-ng alsa-firmware-loaders iw atmel-firmware firmware-atheros firmware-brcm80211 firmware-ipw2x00 firmware-iwlwifi firmware-libertas firmware-linux firmware-linux-nonfree firmware-ralink firmware-realtek zd1211-firmware linux-wlan-ng-firmware alsa-firmware-loaders hostapd isc-hdcp-server 
 
 #**Configuration and Files**
 cd /opt
@@ -47,7 +47,13 @@ cp etc/rc.local /etc
 cp etc/avahi/services/* /etc/avahi/services/
 cp etc/samba/smb.conf /etc/samba
 cp etc/modules /etc
-cp etc/network/interfaces /etc/network
+cp etc/network/* /etc/network/
+ln -sf /etc/network/inferfaces-dhcp /etc/network/interfaces
+cp etc/default/* /etc/default/
+cp etc/dhcp/dhcpd.conf /etc/dhcp/
+mkdir /etc/hostapd
+cp etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf
+cp usr/sbin/hostapd /usr/sbin/hostapd
 mkdir /etc/firewall
 cp etc/firewall/* /etc/firewall
 
