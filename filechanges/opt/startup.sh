@@ -106,7 +106,7 @@ then
     OUTPUT="analog"
 fi
 
-echo 
+echo
 echo "Line out set to $OUTPUT"
 echo
 
@@ -135,10 +135,7 @@ pcm.!default {
         }
     }
 }
-EOF
-else
-    cat << EOF >> /etc/asound.conf
-pcm.!default {
+ctl.!default {
     type hw
     card $CARD
 }
